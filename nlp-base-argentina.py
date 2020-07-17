@@ -1,12 +1,13 @@
 #sacar el dataset de github -andando
 
 import pandas as pd
+import re
 url = 'https://raw.githubusercontent.com/HPanzini/CursoUdemyML/master/all%20Argentina%20q2%202020.txt'
 dataset = pd.read_csv(url, encoding='latin-1', sep='\t')
 datastring = str(dataset)
 #test raw data -andando
 
-print(datastring)
+print(dataset)
 print(type(dataset))
 
 #limpiar texto
@@ -15,7 +16,7 @@ import re
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 corpus = []
-for i in range(0,1705):
+for i in range(0,2875):
     review= re.sub('[^a-zA-Z]', ' ', dataset['Texto'][i])
     review=review.lower()
     review=review.split()
