@@ -1,0 +1,7 @@
+Texto	Sentiment
+"La Coca-Cola es horrible, no la vuelvo a comprar nunca más"	
+"Los de Arcor son unos ingratos, despidieron a 1000 personas en la planta de Rio Negro"	
+Que ganas de comerme un panchito	
+Me estoy cortando las uñas	
+"La Pepsi es una bebida de mierda, es tinta china con azúcar"	
+"Ni en pedo me compro el Age of Empires a menos que baje de precio, además que tiene unos gráficos de mierda no lo voy a jugar, mal juego."	
