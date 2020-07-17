@@ -1,47 +1,63 @@
 #sacar el dataset de github -andando
 
 import pandas as pd
-url = 'https://raw.githubusercontent.com/HPanzini/CursoUdemyML/master/all%20Argentina%20q2%202020.csv?token=APABFG3CRX64KWGJILDHN6C7BJOQK'
-dataset = pd.read_csv(url, index_col=0, quoting=3, error_bad_lines=False, warn_bad_lines=False)
-
+url = 'https://raw.githubusercontent.com/HPanzini/CursoUdemyML/master/all%20Argentina%20q2%202020.txt'
+dataset = pd.read_csv(url, encoding='latin-1', sep='\t')
+datastring = str(dataset)
 #test raw data -andando
 
-print(dataset.head(10))
+print(datastring)
+print(type(dataset))
 
-#tokenizar
+#limpiar texto
 
-from nltk import sent_tokenize, word_tokenize
-ejemplo = 'A Panchito lo operamos el 10 de agosto, en la veterinaria El Arca. El veterinario se llama Diego y es pelado. '
-
-print(sent_tokenize(dataset))
-
-print(word_tokenize(dataset))
-
-#sacar stopwords
-
+import re
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk.stem.porter import PorterStemmer
+corpus = []
+for i in range(0,1705):
+    review= re.sub('[^a-zA-Z]', ' ', dataset['Texto'][i])
+    review=review.lower()
+    review=review.split()
+    ps=PorterStemmer()
+    review=[ps.stem(word) for word in review if not word in set(stopwords.words("spanish"))]
+    review=' '.join(review)
+    corpus.append(review)
 
-stop_words = set(stopwords.words("spanish"))
-words = word_tokenize(ejemplo)
+print(corpus)
 
-print(words)
+# modelo bag of words 
+# max features toma las 1500 palabras mas comunes, sacando stopwords
 
-filtered_sentence = []
-for w in words:
-    if not w in stop_words:
-        filtered_sentence.append(w)
+from sklearn.feature_extraction.text import CountVectorizer
+cv = CountVectorizer(max_features=1500)
+X = cv.fit_transform(corpus).toarray()
+Y = dataset.iloc[:, -1].values
 
-print(filtered_sentence)
+# training sets y test sets
+# test-size 0.20 indica que el 20% de nuestro doc va a ser usado para comprobar el funcionamiento de el ML
+# random-state=0 nos dice que no se va a mezclar
 
-# stemming
+from sklearn.model_selection import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20, random_state=0)
 
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
+# entrenamiento (elegir modelo mas indicado evaluando accuracy vs test set)
 
-ps = PorterStemmer()
+from sklearn.naive_bayes import GaussianNB
+classifier = GaussianNB()
+classifier.fit(X_train, Y_train)
 
-for w in word_tokenize(ejemplo):
-    print(ps.stem(w))
+# predecir resultados utilizando el test-set del dataset
 
-# speech tagging ??????? 
+import numpy as np
+Y_pred = classifier.predict(X_test)
+print(np.concatenate((Y_pred.reshape(len(Y_pred),1), Y_test.reshape(len(Y_test),1)),1))
+
+#confusion matrix + accuracy score
+
+from sklearn.metrics import confusion_matrix, accuracy_score
+cm = confusion_matrix(Y_test,Y_pred)
+print(cm)
+accuracy_score(Y_test,Y_pred)
+
+## predecir documento
